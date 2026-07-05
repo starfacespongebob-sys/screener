@@ -1,13 +1,24 @@
-// inputHandler.js
-const robot = require('robotjs');
+const { mouse, keyboard, Key, Button } = require("@nut-tree/nut-js");
 
-function applyInput(event) {
+async function applyInput(event) {
   if (event.type === 'mouse') {
-    robot.moveMouse(event.x, event.y);
-    if (event.click) robot.mouseClick(event.click);
+    // Move mouse
+    await mouse.move([event.x, event.y]);
+
+    // Handle clicks
+    if (event.click) {
+      if (event.click === 'left') await mouse.click(Button.LEFT);
+      if (event.click === 'right') await mouse.click(Button.RIGHT);
+      if (event.click === 'middle') await mouse.click(Button.MIDDLE);
+    }
   }
+
   if (event.type === 'keyboard') {
-    robot.keyTap(event.key);
+    // Convert raw key string to nut.js Key enum
+    const key = Key[event.key.toUpperCase()];
+    if (key) {
+      await keyboard.type(key);
+    }
   }
 }
 
