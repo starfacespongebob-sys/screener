@@ -1,0 +1,11 @@
+name: CI/CD Pipeline
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Host
+        run: dotnet build ./host
+      - name: Build Guest
+        run: npm install && npm run build --prefix ./guest
