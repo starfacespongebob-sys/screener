@@ -1,0 +1,14 @@
+services:
+  host:
+    build:
+      context: ./host
+      dockerfile: Dockerfile
+    ports:
+      - "5001:8080"
+
+  relay:
+    build:
+      context: ./relay
+      dockerfile: Dockerfile
+    ports:
+      - "8041:8041"
