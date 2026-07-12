@@ -1,6 +1,6 @@
 # screener
 
-Remote screen-sharing / remote support app (synced from production VPS).
+Remote screen-sharing 
 
 ## Run locally
 
@@ -9,6 +9,3 @@ npm install
 cp .env.example .env
 npm start
 ```
-
-- Technician: http://localhost:8080/viewer.html
-- Client: http://localhost:8080/client.html
