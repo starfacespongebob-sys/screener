@@ -1,23 +1,19 @@
 {
-  "name": "guest-client",
+  "name": "remote-support",
   "version": "1.0.0",
-  "main": "main.js",
+  "description": "Browser-based screen sharing for remote technical assistance",
+  "main": "server.js",
   "scripts": {
-    "start": "electron .",
-    "test": "jest"
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
-    "electron": "^29.0.0",
-    "robotjs": "^0.6.0",
-    "uuid": "^14.0.1",
-    "ws": "^8.21.0"
-  },
-  "devDependencies": {
-    "jest": "^29.0.0"
-  },
-  "allowScripts": {
-    "electron@29.4.6": true,
-    "fsevents@2.3.3": true,
-    "robotjs@0.6.0": true
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "ws": "^8.18.0"
   }
 }

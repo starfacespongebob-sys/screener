@@ -1,0 +1,36 @@
+{
+  "build": "2026.07.06-v12",
+  "viewer": "smart-connect",
+  "features": [
+    "screen-sharing",
+    "remote-control",
+    "chat",
+    "native-agent",
+    "unattended-endpoints"
+  ],
+  "assets": {
+    "admin": {
+      "html": "/viewer.html",
+      "css": "/viewer.css",
+      "js": "/viewer.js"
+    },
+    "client": {
+      "html": "/client.html",
+      "css": "/styles.css",
+      "js": "/client.js"
+    },
+    "shared": {
+      "rtcUtils": "/rtc-utils.js"
+    }
+  },
+  "requiredFiles": [
+    "viewer.html",
+    "viewer.css",
+    "viewer.js",
+    "client.html",
+    "client.js",
+    "styles.css",
+    "rtc-utils.js",
+    "version.json"
+  ]
+}

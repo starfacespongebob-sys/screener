@@ -1,0 +1,12 @@
+{
+  "version": "1.0.10",
+  "product": "Remote Support Agent",
+  "platform": "windows-x64",
+  "downloadUrl": "https://remotesharing.space/downloads/RemoteSupport-Agent-Windows-x64-1.0.10.exe",
+  "sha256": "7c6576d67b9c8c56708933034241d1bac12a387b1bca367999e3e426de8fbb33",
+  "server": "wss://remotesharing.space",
+  "installArgs": "--install --server wss://remotesharing.space --accept-consent",
+  "minWindows": "10.0.17763",
+  "publishedAt": "2026-07-08T20:30:00Z",
+  "changelog": "Start-Agent.cmd launches daemon in background; safe to close CMD"
+}

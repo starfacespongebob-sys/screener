@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Smart Connect | Guest</title>
+<link rel="stylesheet" href="/styles.css?v=12">
+</head>
+<body class="client-app">
+
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-mark"></span>
+    Remote Console
+    <span class="brand-sub">Guest</span>
+  </div>
+  <div class="status"><span class="dot" id="connDot"></span><span id="connLabel">Connecting…</span></div>
+</div>
+
+<div class="card stack" id="joinCard">
+  <div>
+    <h1>Join support session</h1>
+    <p class="lead">Enter the session code provided by your technician to connect.</p>
+  </div>
+  <div class="field">
+    <label for="codeInput">Session code</label>
+    <input type="text" id="codeInput" maxlength="8" placeholder="ABCD1234" autocomplete="off">
+  </div>
+  <button class="btn-primary" id="joinBtn">Connect to Session</button>
+  <div id="joinBanner" class="banner error"></div>
+</div>
+
+<div class="card stack" id="waitingCard" style="display:none">
+  <div class="session-status-pill warn">
+    <span class="dot warn"></span>
+    Pending technician approval
+  </div>
+  <h1>Waiting for approval</h1>
+  <p class="lead">Your technician must approve your connection before the session begins.</p>
+</div>
+
+<div class="card stack" id="controlApprovalCard" style="display:none">
+  <div class="approval-box">
+    <div>
+      <strong>Remote control requested</strong>
+      <div class="hint">The technician is asking to control your mouse and keyboard on the shared screen. You can revoke this at any time.</div>
+    </div>
+    <div class="row">
+      <button class="btn-primary" id="allowControlBtn">Allow Control</button>
+      <button class="btn-danger" id="denyControlBtn">Deny</button>
+    </div>
+  </div>
+</div>
+
+<div class="card stack" id="shareCard" style="display:none">
+  <div class="session-header-row">
+    <div>
+      <h1>Support session active</h1>
+      <p class="lead">Your technician can see your screen only while you are actively sharing.</p>
+    </div>
+    <div class="session-status-pill live" id="sessionStatusPill" style="display:none">
+      <span class="dot live"></span>
+      Connected
+    </div>
+  </div>
+
+  <div class="sharing-indicator" id="sharingIndicator" style="display:none">
+    <span class="dot"></span>
+    Screen sharing is active
+  </div>
+
+  <div id="controlActiveBanner" class="banner warn" style="display:none">
+    Remote control is active. The technician can interact with your screen.
+  </div>
+
+  <div class="row">
+    <button class="btn-primary" id="shareBtn">Share My Screen</button>
+    <button class="btn-danger" id="stopBtn" style="display:none">Stop Sharing</button>
+    <button class="btn-secondary" id="revokeControlBtn" style="display:none">Revoke Control</button>
+    <button class="btn-secondary" id="leaveBtn">Leave Session</button>
+  </div>
+
+  <div id="shareBanner" class="banner warn"></div>
+
+  <div class="layout with-chat">
+    <div class="video-wrap" id="previewWrap" style="display:none">
+      <video id="preview" autoplay playsinline muted></video>
+    </div>
+    <div class="chat">
+      <div class="chat-header">Chat with technician</div>
+      <div class="chat-log" id="chatLog"></div>
+      <form class="chat-input" id="chatForm">
+        <input type="text" id="chatInput" placeholder="Message…" maxlength="2000" autocomplete="off">
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>Screen sharing requires your explicit consent. Use the same address as the technician, e.g. http://127.0.0.1:8080</footer>
+
+<script src="/rtc-utils.js?v=12"></script>
+<script src="/client.js?v=12"></script>
+</body>
+</html>

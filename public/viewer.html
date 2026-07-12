@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Smart Connect | Admin Console</title>
+<link rel="stylesheet" href="/viewer.css?v=12">
+</head>
+<body class="console-app">
+
+<!-- Stage 1: Primary navigation -->
+<aside class="sidebar-primary">
+  <div>
+    <div class="brand">Smart <span>Connect</span></div>
+    <ul class="nav-group">
+      <li class="nav-item active">
+        <button type="button" id="navSupport">⚡ Support</button>
+      </li>
+      <li class="nav-item">
+        <button type="button" id="navMonitor" disabled>🖥️ Monitor</button>
+      </li>
+      <li class="nav-item">
+        <button type="button" disabled>👥 Meetings</button>
+      </li>
+      <li class="nav-item">
+        <button type="button" disabled>📋 Audit Logs</button>
+      </li>
+      <li class="nav-item">
+        <button type="button" disabled>⚙️ Administration</button>
+      </li>
+    </ul>
+  </div>
+  <div class="sidebar-footer">
+    <div class="conn-row">
+      <span class="dot" id="connDot"></span>
+      <span id="connLabel">Connecting…</span>
+    </div>
+    <p>User: admin@rspro.local</p>
+    <p>Version 2026.3.1</p>
+  </div>
+</aside>
+
+<!-- Stage 2: Session groups -->
+<aside class="sidebar-secondary">
+  <div class="panel-header">
+    <h2>Session Groups</h2>
+    <button type="button" class="action-btn-sm" id="createBtn">+ Session</button>
+  </div>
+  <ul class="group-tree" id="sessionList">
+    <li class="group-item" id="sessionChipNone">
+      <span class="chip-dot"></span>
+      <span>No active session</span>
+    </li>
+    <li class="group-item sc-session-chip" id="sessionChip" style="display:none">
+      <span class="chip-dot"></span>
+      <span class="chip-code" id="chipCode">--------</span>
+      <span class="group-count">Live</span>
+    </li>
+    <li class="group-item">
+      <span>Browser Clients</span>
+      <span class="group-count">—</span>
+    </li>
+    <li class="group-item">
+      <span>Desktop Agents</span>
+      <span class="group-count">—</span>
+    </li>
+    <li class="group-item">
+      <span>Pending Approval</span>
+      <span class="group-count">0</span>
+    </li>
+  </ul>
+</aside>
+
+<!-- Stage 3: Central work area -->
+<main class="main-content">
+  <div class="search-bar-container">
+    <div class="header-meta" id="headerMeta" style="display:none">
+      <span class="meta-item">
+        ⏱ <span id="sessionTimer">00:00:00</span>
+      </span>
+      <span class="meta-item">
+        Code: <strong class="mono" id="headerCode">--------</strong>
+      </span>
+      <span class="meta-item" id="clientStatusWrap">
+        <span class="dot" id="clientDot"></span>
+        <span id="clientStatusLabel">No client</span>
+      </span>
+    </div>
+    <input type="text" class="search-input" placeholder="Filter sessions by code, client type, or status…" readonly>
+    <button type="button" class="action-btn-sm" style="background-color:var(--primary-color)" id="createBtnTop">New Support Session</button>
+  </div>
+
+  <div class="content-area">
+
+    <!-- Setup: dashboard + start session -->
+    <section class="sc-view" id="setupView">
+      <div class="table-container">
+        <table class="data-table" id="agentsTable">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Machine</th>
+              <th>Operating System</th>
+              <th>User</th>
+              <th>Last Seen</th>
+              <th>ID</th>
+            </tr>
+          </thead>
+          <tbody id="agentsTableBody">
+            <tr>
+              <td colspan="6" style="text-align:center;color:var(--text-muted)">Loading endpoints…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sc-center-panel">
+        <div class="sc-panel-card">
+          <h1>Start a support session</h1>
+          <p class="lead">Generate a session code and share it with the person you are helping. They can connect via browser or the desktop agent.</p>
+          <button type="button" class="sc-btn sc-btn-primary" id="createBtnMain">Generate Session Code</button>
+          <div id="setupBanner" class="sc-banner error"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Waiting for guest -->
+    <section class="sc-view hidden" id="waitingView">
+      <div class="sc-center-panel">
+        <div class="sc-panel-card">
+          <h1>Waiting for connection</h1>
+          <p class="lead">Share this code with your guest. It expires in <span id="expiresIn">30</span> minutes if unused.</p>
+          <div class="sc-code-display" id="sessionCodeDisplay">--------</div>
+          <div class="sc-actions">
+            <button type="button" class="sc-btn sc-btn-secondary" id="copyLinkBtn">Copy Client Link</button>
+            <button type="button" class="sc-btn sc-btn-secondary" id="copyCodeBtn">Copy Code</button>
+            <button type="button" class="sc-btn sc-btn-danger" id="cancelBtn">Cancel Session</button>
+          </div>
+          <div class="sc-banner info show" id="waitingBanner">Waiting for guest to connect…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Active session: remote viewer -->
+    <section class="sc-view hidden" id="sessionView">
+      <div class="viewer-toolbar" id="viewerToolbar">
+        <div class="toolbar-group">
+          <button type="button" class="sc-tool-btn active" id="fitBtn" title="Fit to window">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+          <button type="button" class="sc-tool-btn" id="actualBtn" title="Actual size">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/></svg>
+          </button>
+          <button type="button" class="sc-tool-btn" id="zoomOutBtn" title="Zoom out" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M8 11h6"/></svg>
+          </button>
+          <span class="zoom-label" id="zoomLabel">Fit</span>
+          <button type="button" class="sc-tool-btn" id="zoomInBtn" title="Zoom in" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M11 8v6M8 11h6"/></svg>
+          </button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button type="button" class="sc-tool-btn" id="screenshotBtn" title="Screenshot" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </button>
+          <button type="button" class="sc-tool-btn" id="fullscreenBtn" title="Fullscreen (F)" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <button type="button" class="sc-tool-btn" id="controlBtn" title="Request remote control" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+            Control
+          </button>
+          <button type="button" class="sc-tool-btn success" id="revokeControlBtn" title="Revoke control" style="display:none">
+            Revoke
+          </button>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <div class="toolbar-group">
+          <button type="button" class="sc-tool-btn danger" id="endBtn" title="End session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            End Session
+          </button>
+        </div>
+      </div>
+
+      <div class="sc-viewer-stage" id="viewerStage">
+        <div class="sc-viewport fit" id="videoWrap">
+          <video id="video" autoplay playsinline muted style="display:none"></video>
+          <canvas id="frameCanvas" style="display:none"></canvas>
+          <div class="sc-viewer-placeholder" id="videoPlaceholder">
+            <span>Waiting for remote screen…</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-statusbar">
+        <span class="stat" id="statResolution">
+          Resolution <span class="stat-value" id="statResValue">—</span>
+        </span>
+        <span class="stat live" id="statFps">
+          FPS <span class="stat-value" id="statFpsValue">—</span>
+        </span>
+        <span class="stat" id="statLatency">
+          Latency <span class="stat-value" id="statLatencyValue">—</span>
+        </span>
+        <span class="stat" id="statStream">
+          Stream <span class="stat-value" id="statStreamValue">Idle</span>
+        </span>
+        <span class="sc-statusbar-spacer"></span>
+        <span class="stat" id="statControl">
+          Control <span class="stat-value" id="statControlValue">Off</span>
+        </span>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Stage 4: Right detail / command panel -->
+<aside class="sidebar-right">
+  <div class="panel-header">
+    <h2 id="detail-machine-title">Session Details</h2>
+  </div>
+  <div class="detail-body">
+
+    <div class="command-grid">
+      <button type="button" class="cmd-btn primary-cmd" id="detailJoinBtn" disabled>Connect to Endpoint</button>
+      <button type="button" class="cmd-btn" id="detailControlBtn" disabled>Request Control</button>
+      <button type="button" class="cmd-btn" id="detailScreenshotBtn" disabled>Screenshot</button>
+      <button type="button" class="cmd-btn" id="detailCopyLink">Copy Client Link</button>
+      <button type="button" class="cmd-btn danger-cmd" id="detailEndBtn" disabled>End Session</button>
+    </div>
+
+    <div class="sc-tabs">
+      <button type="button" class="sc-tab active" data-tab="chat">Chat</button>
+      <button type="button" class="sc-tab" data-tab="session">Session</button>
+      <button type="button" class="sc-tab" data-tab="monitor">Monitor</button>
+    </div>
+
+    <div class="sc-tab-panel active" id="tabChat">
+      <div class="sc-chat-log" id="chatLog"></div>
+      <form class="sc-chat-input" id="chatForm">
+        <input type="text" id="chatInput" placeholder="Message guest…" maxlength="2000" autocomplete="off">
+        <button type="submit">Send</button>
+      </form>
+    </div>
+
+    <div class="sc-tab-panel" id="tabSession">
+      <div class="sc-detail-list">
+        <div class="detail-section">
+          <h3>Host Overview</h3>
+          <div class="info-grid">
+            <div class="info-label">Session code:</div>
+            <div class="info-value sc-detail-value mono" id="detailCode">—</div>
+            <div class="info-label">Client type:</div>
+            <div class="info-value sc-detail-value" id="detailClientType">—</div>
+            <div class="info-label">Connection:</div>
+            <div class="info-value sc-detail-value" id="detailConnection">—</div>
+            <div class="info-label">Duration:</div>
+            <div class="info-value sc-detail-value mono" id="detailDuration">—</div>
+            <div class="info-label">Expires:</div>
+            <div class="info-value sc-detail-value" id="detailExpires">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sc-tab-panel" id="tabMonitor">
+      <div class="sc-detail-list">
+        <div class="detail-section">
+          <h3>Stream Telemetry</h3>
+          <div class="info-grid">
+            <div class="info-label">Frames:</div>
+            <div class="info-value mono" id="detailFrames">0</div>
+            <div class="info-label">Avg FPS:</div>
+            <div class="info-value mono" id="detailAvgFps">—</div>
+            <div class="info-label">Latency:</div>
+            <div class="info-value mono" id="detailAvgLatency">—</div>
+            <div class="info-label">Last frame:</div>
+            <div class="info-value" id="detailLastFrame">—</div>
+            <div class="info-label">Control:</div>
+            <div class="info-value sc-detail-value" id="detailControl">Inactive</div>
+          </div>
+          <div class="sc-quality-bar">
+            <h3>Stream Quality</h3>
+            <div class="sc-quality-meter">
+              <div class="sc-quality-meter-fill" id="qualityFill" style="width:0%"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted)" id="qualityLabel">No stream data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<!-- Guest approval dialog -->
+<div class="sc-approval-overlay" id="approvalOverlay">
+  <div class="sc-approval-dialog">
+    <h2>Guest requesting access</h2>
+    <p id="approvalHint">Someone entered your session code. Only approve if you are expecting them.</p>
+    <div class="sc-actions">
+      <button type="button" class="sc-btn sc-btn-primary" id="approveBtn">Approve Connection</button>
+      <button type="button" class="sc-btn sc-btn-danger" id="denyBtn">Deny</button>
+    </div>
+  </div>
+</div>
+
+<div class="sc-toast" id="toast"></div>
+
+<script src="/rtc-utils.js?v=12"></script>
+<script src="/viewer.js?v=12"></script>
+</body>
+</html>
